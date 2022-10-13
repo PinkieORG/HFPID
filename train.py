@@ -52,11 +52,11 @@ class HFPID(pl.LightningModule):
 
     def train_dataloader(self):
         dataset = Imagenette2('train', input_size=self.hparams.input_size)
-        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True)  # make a hparam
+        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
     def test_dataloader(self):
         dataset = Imagenette2('val', input_size=self.hparams.input_size)
-        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True)  # make a hparam
+        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.hparams.lr, betas=(self.hparams.beta1, self.hparams.beta2),
@@ -85,5 +85,9 @@ if __name__ == '__main__':
     args = get_args()
     logger = TensorBoardLogger('./logs')
     pl_model = HFPID(hparams=args)
-    trainer = pl.Trainer(logger=logger, max_epochs=args.num_epochs, log_every_n_steps=1)
+    trainer = pl.Trainer(logger=logger,
+                         max_epochs=args.num_epochs,
+                         log_every_n_steps=args.log_every_n_steps,
+                         accelerator='gpu',
+                         devices=1)
     trainer.fit(pl_model)
