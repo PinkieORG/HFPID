@@ -1,5 +1,8 @@
 import argparse
+from pathlib import Path
+
 import torch.utils.data
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch import optim
 import torch.nn as nn
@@ -12,7 +15,7 @@ from dataset import Imagenette2
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ref_upscaler', default='bilinear',
-                        help="Method to get a referential upscaled image for encoder output." 
+                        help="Method to get a referential upscaled image for encoder output."
                              "Possible methods: bilinear")
     parser.add_argument('--alpha', default=0.15, help="Weigh for controlling a strength of SSIM loss.", type=int)
     parser.add_argument('--lamb', default=0.15, help="Weigh for controlling a strength of encoder loss.", type=int)
@@ -20,10 +23,10 @@ def get_args():
                         help="Size of the input images. One number for square size.", type=int)
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
     parser.add_argument('--encoder_dims', default=[32, 64, 64, 64, 32],
-                        help="List representing numbers of channels of encoder inner layers " 
+                        help="List representing numbers of channels of encoder inner layers "
                              "(first value represent how many channels the first layer outputs).", type=list)
     parser.add_argument('--decoder_dims', default=[32, 32],
-                        help="List representing numbers of channels of encoder inner layers " 
+                        help="List representing numbers of channels of encoder inner layers "
                              "(because of the skipping connections, there are only two values).", type=list)
     parser.add_argument('--log_every_n_steps', default=5, type=int)
     parser.add_argument('--batch_size', default=32, type=int)
@@ -68,8 +71,14 @@ class HFPID(pl.LightningModule):
         loss = self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref)
         y_down = self.decoder(y_up)
         loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
-        self.log("loss", loss)
         return loss
+
+    def training_epoch_end(self, outputs):
+        loss = 0
+        for out in outputs:
+            loss += out['loss']
+        loss = loss / len(outputs)
+        self.log('loss', loss)
 
     def test_step(self, x):
         return self.training_step(x)
@@ -84,8 +93,16 @@ class HFPID(pl.LightningModule):
 if __name__ == '__main__':
     args = get_args()
     logger = TensorBoardLogger('./logs')
+    checkpoint_dir = (Path(logger.save_dir)
+                      / f"version_{logger.version}")
+    checkpoint_callback = ModelCheckpoint(
+        dirpath=str(checkpoint_dir),
+        monitor='loss',
+        filename='weights',
+        mode='min')
     pl_model = HFPID(hparams=args)
     trainer = pl.Trainer(logger=logger,
+                         callbacks=[checkpoint_callback],
                          max_epochs=args.num_epochs,
                          log_every_n_steps=args.log_every_n_steps,
                          accelerator='gpu',
