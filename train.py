@@ -29,6 +29,7 @@ def get_args():
                         help="List representing numbers of channels of encoder inner layers "
                              "(because of the skipping connections, there are only two values).", type=list)
     parser.add_argument('--log_every_n_steps', default=5, type=int)
+    parser.add_argument('--check_val_every_n_epoch', default=1, type=int)
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_epochs', default=60, type=int)
     parser.add_argument('--lr', default=0.0001, type=int)
@@ -57,7 +58,7 @@ class HFPID(pl.LightningModule):
         dataset = Imagenette2('train', input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
-    def test_dataloader(self):
+    def val_dataloader(self):
         dataset = Imagenette2('val', input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
@@ -73,21 +74,20 @@ class HFPID(pl.LightningModule):
         loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
-    def training_epoch_end(self, outputs):
+    def validation_epoch_end(self, outputs):
         loss = 0
         for out in outputs:
             loss += out['loss']
         loss = loss / len(outputs)
         self.log('loss', loss)
 
-    def test_step(self, x):
-        return self.training_step(x)
-
-    def on_train_start(self):
-        print("Starting training")
-
-    def on_test_start(self):
-        print("Starting testing")
+    def validation_step(self, x):
+        y_ref = self.ref_upscaler(x)
+        y_up = self.encoder(x)
+        loss = self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref)
+        y_down = self.decoder(y_up)
+        loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
+        return loss
 
 
 if __name__ == '__main__':
@@ -105,6 +105,7 @@ if __name__ == '__main__':
                          callbacks=[checkpoint_callback],
                          max_epochs=args.num_epochs,
                          log_every_n_steps=args.log_every_n_steps,
+                         check_val_every_n_epoch=args.check_val_every_n_epoch,
                          accelerator='gpu',
                          devices=1)
     trainer.fit(pl_model)
