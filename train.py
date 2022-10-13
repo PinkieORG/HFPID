@@ -1,6 +1,5 @@
 import argparse
 from pathlib import Path
-
 import torch.utils.data
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -36,7 +35,6 @@ def get_args():
     parser.add_argument('--beta1', default=0.9, type=int)
     parser.add_argument('--beta2', default=0.999, type=int)
     parser.add_argument('--eps', default=0.00000001, type=int)
-
     return parser.parse_args()
 
 
