@@ -18,7 +18,7 @@ def get_args():
                              "Possible methods: bilinear")
     parser.add_argument('--alpha', default=0.15, help="Weigh for controlling a strength of SSIM loss.", type=int)
     parser.add_argument('--lamb', default=0.15, help="Weigh for controlling a strength of encoder loss.", type=int)
-    parser.add_argument('--input_size', default=255,
+    parser.add_argument('--input_size', default=256,
                         help="Size of the input images. One number for square size.", type=int)
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
     parser.add_argument('--encoder_dims', default=[32, 64, 64, 64, 32],
@@ -75,11 +75,11 @@ class HFPID(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         loss = 0
         for out in outputs:
-            loss += out['loss']
+            loss += out
         loss = loss / len(outputs)
         self.log('loss', loss)
 
-    def validation_step(self, x):
+    def validation_step(self, x, xid):
         y_ref = self.ref_upscaler(x)
         y_up = self.encoder(x)
         loss = self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref)
@@ -102,6 +102,7 @@ if __name__ == '__main__':
     trainer = pl.Trainer(logger=logger,
                          callbacks=[checkpoint_callback],
                          max_epochs=args.num_epochs,
+                         num_sanity_val_steps=0,
                          log_every_n_steps=args.log_every_n_steps,
                          check_val_every_n_epoch=args.check_val_every_n_epoch,
                          accelerator='gpu',
