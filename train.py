@@ -23,10 +23,10 @@ def get_args():
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
     parser.add_argument('--encoder_dims', default=[32, 64, 64, 64, 32],
                         help="List representing numbers of channels of encoder inner layers "
-                             "(first value represent how many channels the first layer outputs).", type=list)
+                             "(first value represent how many channels the first layer outputs).", nargs=5, type=int)
     parser.add_argument('--decoder_dims', default=[32, 32],
                         help="List representing numbers of channels of encoder inner layers "
-                             "(because of the skipping connections, there are only two values).", type=list)
+                             "(because of the skipping connections, there are only two values).", nargs=2, type=int)
     parser.add_argument('--log_every_n_steps', default=5, type=int)
     parser.add_argument('--check_val_every_n_epoch', default=1, type=int)
     parser.add_argument('--batch_size', default=32, type=int)
@@ -58,7 +58,7 @@ class HFPID(pl.LightningModule):
 
     def val_dataloader(self):
         dataset = Imagenette2('val', input_size=self.hparams.input_size)
-        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
+        return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.hparams.lr, betas=(self.hparams.beta1, self.hparams.beta2),
@@ -90,7 +90,7 @@ class HFPID(pl.LightningModule):
 
 if __name__ == '__main__':
     args = get_args()
-    logger = TensorBoardLogger('./logs')
+    logger = TensorBoardLogger('.')
     checkpoint_dir = (Path(logger.save_dir)
                       / f"version_{logger.version}")
     checkpoint_callback = ModelCheckpoint(
