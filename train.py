@@ -21,16 +21,16 @@ def get_args():
     parser.add_argument('--input_size', default=256,
                         help="Size of the input images. One number for square size.", type=int)
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
-    parser.add_argument('--encoder_dims', default=[32, 64, 64, 64, 32],
+    parser.add_argument('-e', '--encoder_dims', default=[32, 64, 64, 64, 32],
                         help="List representing numbers of channels of encoder inner layers "
                              "(first value represent how many channels the first layer outputs).", nargs=5, type=int)
-    parser.add_argument('--decoder_dims', default=[32, 32],
+    parser.add_argument('-d', '--decoder_dims', default=[32, 32],
                         help="List representing numbers of channels of encoder inner layers "
                              "(because of the skipping connections, there are only two values).", nargs=2, type=int)
     parser.add_argument('--log_every_n_steps', default=5, type=int)
     parser.add_argument('--check_val_every_n_epoch', default=1, type=int)
-    parser.add_argument('--batch_size', default=32, type=int)
-    parser.add_argument('--num_epochs', default=60, type=int)
+    parser.add_argument('-b', '--batch_size', default=32, type=int)
+    parser.add_argument('-n', '--num_epochs', default=60, type=int)
     parser.add_argument('--lr', default=0.0001, type=int)
     parser.add_argument('--beta1', default=0.9, type=int)
     parser.add_argument('--beta2', default=0.999, type=int)
