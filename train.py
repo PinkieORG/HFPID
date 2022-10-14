@@ -91,7 +91,7 @@ class HFPID(pl.LightningModule):
 
 if __name__ == '__main__':
     args = get_args()
-    logger = TensorBoardLogger('.')
+    logger = TensorBoardLogger('./logs', name='')
     checkpoint_dir = (Path(logger.save_dir)
                       / f"version_{logger.version}")
     checkpoint_callback = ModelCheckpoint(
