@@ -47,7 +47,7 @@ class HFPID(pl.LightningModule):
         self.L1Loss = nn.L1Loss()
         self.SSIM = SSIM()
 
-        if hparams.ref_upscaler == 'bilinear':
+        if self.hparams.ref_upscaler == 'bilinear':
             self.ref_upscaler = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
             raise ValueError("Method for referential upscaled image is missing or not among possible choices.")
