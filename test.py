@@ -18,12 +18,15 @@ if __name__ == '__main__':
     args = get_args()
     model = HFPID.load_from_checkpoint(args.weights)
     decoder = model.decoder
-    transform = transforms.Compose([transforms.Resize((args.input_size, args.input_size)),
-                                    transforms.ToTensor(),
+    resize = transforms.Resize((args.input_size, args.input_size))
+    transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
     inv_transform = transforms.Normalize([-0.485, -0.456, -0.406], [1/0.229, 1/0.224, 1/0.225])
     toImage = transforms.ToPILImage()
+
     I_in = Image.open(args.file).convert('RGB')
+    I_in = resize(I_in)
+    I_in.save('int.jpg')
     x = transform(I_in).unsqueeze(0)
     y = decoder(x)
     y = inv_transform(y).squeeze()
