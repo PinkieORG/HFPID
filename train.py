@@ -47,6 +47,7 @@ class HFPID(pl.LightningModule):
         self.L1Loss = nn.L1Loss()
         self.SSIM = SSIM()
 
+
         if self.hparams.ref_upscaler == 'bilinear':
             self.ref_upscaler = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
@@ -99,6 +100,7 @@ if __name__ == '__main__':
         filename='weights',
         mode='min')
     pl_model = HFPID(hparams=args)
+    logger.log_hyperparams(args)
     trainer = pl.Trainer(logger=logger,
                          callbacks=[checkpoint_callback],
                          max_epochs=args.num_epochs,
