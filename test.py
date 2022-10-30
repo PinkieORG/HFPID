@@ -21,10 +21,11 @@ if __name__ == '__main__':
     resize = transforms.Resize((args.input_size, args.input_size))
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-    inv_transform = transforms.Normalize([-0.485, -0.456, -0.406], [1/0.229, 1/0.224, 1/0.225])
+    inv_transform = transforms.Compose([transforms.Normalize([0, 0, 0], [1 / 0.229, 1 / 0.224, 1 / 0.225]),
+                                        transforms.Normalize([-0.485, -0.456, -0.406], [1, 1, 1])])
     toImage = transforms.ToPILImage()
 
-    I_in = Image.open(args.file).convert('RGB')
+    I_in = Image.open(args.file)
     I_in = resize(I_in)
     I_in.save('int.jpg')
     x = transform(I_in).unsqueeze(0)
