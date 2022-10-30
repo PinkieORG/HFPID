@@ -121,7 +121,7 @@ class HFPID(pl.LightningModule):
         images = torch.zeros((2*b, c, h, w))
         images[::2, :, :, :] = ref
         images[1::2, :, :, :] = y
-        save_image(images, fp=Path(self.hparams.test_output_dir, 'test_output.jpg'), nrow=6)
+        save_image(images, fp=Path(self.hparams.test_output_dir, 'test_output{}.jpg'.format(xid)), nrow=6)
 
 
 if __name__ == '__main__':
