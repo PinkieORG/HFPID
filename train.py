@@ -8,7 +8,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from torchmetrics import StructuralSimilarityIndexMeasure as SSIM
 from torchvision.transforms import transforms
-from torchvision.utils import make_grid, save_image
+from torchvision.utils import save_image
 
 import models
 from dataset import Imagenette2, OneImage
@@ -40,11 +40,12 @@ def get_args():
     parser.add_argument('--eps', default=0.00000001, type=int)
 
     # For test mode.
-    parser.add_argument('--weights', default='', help="If path to file with weights is passed then program will enter test mode."
-                                                      "Input image(s) will be pre-resized to 2 times of the input_size"
-                                                      "of the loaded model and fed to the encoder part of the model."
-                                                      "Will use validation dataset on default. If you want to use"
-                                                      "other image then specify test_file argument (only one at the time).")
+    parser.add_argument('--weights', default='',
+                        help="If path to file with weights is passed then program will enter test mode."
+                             "Input image(s) will be pre-resized to 2 times of the input_size"
+                             "of the loaded model and fed to the encoder part of the model."
+                             "Will use validation dataset on default. If you want to use"
+                             "other image then specify test_file argument (only one at the time).")
     parser.add_argument('--test_image', default='', help="Image to downscale when in test mode.")
     parser.add_argument('--test_output_dir', default='test', help="Directory where outputs of testing will be saved.")
     return parser.parse_args()
@@ -73,7 +74,7 @@ class HFPID(pl.LightningModule):
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def test_dataloader(self):
-        if self.hparams.test_file:
+        if self.hparams.test_image:
             dataset = OneImage(self.hparams.test_image, input_size=2 * self.hparams.input_size)
             return torch.utils.data.DataLoader(dataset, batch_size=1)
         dataset = Imagenette2('test', input_size=self.hparams.input_size)
@@ -143,8 +144,8 @@ if __name__ == '__main__':
                          devices=2)
     if args.weights:
         pl_model = HFPID.load_from_checkpoint(args.weights,
-                                              test_image = args.test_image,
-                                              test_output_dir = args.test_output_dir)
+                                              test_image=args.test_image,
+                                              test_output_dir=args.test_output_dir)
         trainer.test(pl_model)
     else:
         trainer.fit(pl_model)
