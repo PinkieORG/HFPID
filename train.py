@@ -144,7 +144,7 @@ if __name__ == '__main__':
                          log_every_n_steps=args.log_every_n_steps,
                          check_val_every_n_epoch=args.check_val_every_n_epoch,
                          accelerator='gpu',
-                         devices=2)
+                         devices=1)
     if args.weights:
         pl_model = HFPID.load_from_checkpoint(args.weights,
                                               test_image=args.test_image,
