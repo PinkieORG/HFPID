@@ -2,6 +2,7 @@ import argparse
 import pdb
 from pathlib import Path
 import torch.utils.data
+from PIL.Image import Image
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch import optim
@@ -121,7 +122,16 @@ class HFPID(pl.LightningModule):
         images = torch.zeros((2*b, c, h, w))
         images[::2, :, :, :] = ref
         images[1::2, :, :, :] = y
-        save_image(images, fp=Path(self.hparams.test_output_dir, 'test_output{}.jpg'.format(xid)), nrow=6)
+        save_image(images, fp=Path(self.hparams.test_output_dir, 'grid{}.jpg'.format(xid)), nrow=6)
+
+        size = self.hparams.input_size
+
+        for i in range(x[0]):
+            out = Image.new('RGB', (4 * size, 2 * size))
+            out.paste(ref[i], (0, 0))
+            out.paste(x[0][i], (size, 0))
+            out.paste(y[i], (3 * size, 0))
+            out.save(Path(self.hparams.test_output_dir, 'output{}_{}.jpg'.format(xid, i)))
 
 
 if __name__ == '__main__':
