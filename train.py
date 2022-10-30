@@ -1,8 +1,9 @@
 import argparse
 import pdb
 from pathlib import Path
+
+from PIL.Image import new as new_image
 import torch.utils.data
-from PIL.Image import Image
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch import optim
@@ -127,7 +128,7 @@ class HFPID(pl.LightningModule):
         size = self.hparams.input_size
 
         for i in range(self.hparams.batch_size):
-            out = Image.new('RGB', (4 * size, 2 * size))
+            out = new_image('RGB', (4 * size, 2 * size))
             out.paste(ref[i], (0, 0))
             out.paste(x[0][i], (size, 0))
             out.paste(y[i], (3 * size, 0))
