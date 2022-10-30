@@ -1,6 +1,5 @@
 import argparse
 
-import PIL
 from train import HFPID
 import torchvision.transforms as transforms
 from PIL import Image
@@ -30,8 +29,13 @@ if __name__ == '__main__':
     I_in = Image.open(args.file)
     I_in = resize(I_in)
     I_in.save('in.jpg')
-    I_res = I_in.resize((int(args.input_size / 2), int(args.input_size / 2)), PIL.Image.BILINEAR)
-    I_res.save('res.jpg')
+    im = transform(I_in)
+    im[::2, :] = 0
+    im[:, ::2] = 0
+    # I_res = I_in.resize((int(args.input_size / 2), int(args.input_size / 2)), PIL.Image.BILINEAR)
+    im = inv_transform(im)
+    im = toImage(im)
+    im.save('res.jpg')
     x = transform(I_in).unsqueeze(0)
     y = decoder(x)
     y = inv_transform(y).squeeze()
