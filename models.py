@@ -35,10 +35,10 @@ class DID(nn.Module):
         self.conv5 = nn.Conv2d(dims[1], in_channels, 3, padding=1)
 
     def forward(self, x):
-        # y = self.space_to_depth(x)
-        # y = self.conv1(y)
-        # y = self.conv2(y) + y
-        # y = self.conv3(y)
-        # y = self.conv4(y) + y
-        # y = self.conv5(y)
-        return nn.functional.interpolate(x, scale_factor=0.5)
+        y = self.space_to_depth(x)
+        y = self.conv1(y)
+        y = self.conv2(y) + y
+        y = self.conv3(y)
+        y = self.conv4(y) + y
+        y = self.conv5(y)
+        return y + nn.functional.interpolate(x, scale_factor=0.5)
