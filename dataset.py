@@ -25,7 +25,7 @@ class Imagenette2(Dataset):
         image = Image.open(image_path).convert('RGB')
         image = self.transform(image)
         if self.mode == 'test':
-            ref_image = nn.functional.interpolate(image.unsqueeze(0), scale_factor=0.5)
+            ref_image = nn.functional.interpolate(image.unsqueeze(0), scale_factor=0.5).squeeze()
             return image, ref_image
         return self.transform(image)
 
