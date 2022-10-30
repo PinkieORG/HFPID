@@ -30,7 +30,7 @@ if __name__ == '__main__':
     I_in = Image.open(args.file)
     I_in = resize(I_in)
     I_in.save('in.jpg')
-    I_res = I_in.resize((args.input_size / 2, args.input_size / 2), PIL.Image.BILINEAR)
+    I_res = I_in.resize((int(args.input_size / 2), int(args.input_size / 2)), PIL.Image.BILINEAR)
     I_res.save('res.jpg')
     x = transform(I_in).unsqueeze(0)
     y = decoder(x)
