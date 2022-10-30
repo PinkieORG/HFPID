@@ -126,7 +126,7 @@ class HFPID(pl.LightningModule):
 
         size = self.hparams.input_size
 
-        for i in range(x[0]):
+        for i in range(self.hparams.batch_size):
             out = Image.new('RGB', (4 * size, 2 * size))
             out.paste(ref[i], (0, 0))
             out.paste(x[0][i], (size, 0))
