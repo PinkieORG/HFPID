@@ -17,7 +17,7 @@ def get_args():
                         help="Method to get a referential upscaled image for encoder output."
                              "Possible methods: bilinear")
     parser.add_argument('--alpha', default=0.15, help="Weigh for controlling a strength of SSIM loss.", type=int)
-    parser.add_argument('--lamb', default=0.15, help="Weigh for controlling a strength of encoder loss.", type=int)
+    parser.add_argument('--lamb', default=0.2, help="Weigh for controlling a strength of encoder loss.", type=int)
     parser.add_argument('--input_size', default=256,
                         help="Size of the input images. One number for square size.", type=int)
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
@@ -67,9 +67,9 @@ class HFPID(pl.LightningModule):
     def training_step(self, x):
         y_ref = self.ref_upscaler(x)
         y_up = self.encoder(x)
-        loss = self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref)
+        loss = self.hparams.lamb * (self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref))
         y_down = self.decoder(y_up)
-        loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
+        loss += self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
     def training_epoch_end(self, outputs):
@@ -78,9 +78,9 @@ class HFPID(pl.LightningModule):
     def validation_step(self, x, xid):
         y_ref = self.ref_upscaler(x)
         y_up = self.encoder(x)
-        loss = self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref)
+        loss = self.hparams.lamb * (self.L1Loss(y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref))
         y_down = self.decoder(y_up)
-        loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
+        loss += self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
     def validation_epoch_end(self, outputs):
