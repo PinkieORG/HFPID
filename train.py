@@ -116,7 +116,7 @@ class HFPID(pl.LightningModule):
         y = self.decoder(x[0])
         y = inv_transform(y)
         ref = inv_transform(x[1])
-        b, c, h, w =y.size
+        b, c, h, w = y.size()
         images = torch.zeros((2*b, c, h, w))
         images[::2, :, :, :] = ref
         images[1::2, :, :, :] = y
