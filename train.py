@@ -2,7 +2,7 @@ import argparse
 import pdb
 from pathlib import Path
 
-from PIL.Image import new as new_image
+from PIL import Image
 import torch.utils.data
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -116,6 +116,8 @@ class HFPID(pl.LightningModule):
     def test_step(self, x, xid):
         inv_transform = transforms.Compose([transforms.Normalize([0, 0, 0], [1 / 0.229, 1 / 0.224, 1 / 0.225]),
                                             transforms.Normalize([-0.485, -0.456, -0.406], [1, 1, 1])])
+        toImage = transforms.ToPILImage()
+
         y = self.decoder(x[0])
         y = inv_transform(y)
         ref = inv_transform(x[1])
@@ -128,10 +130,10 @@ class HFPID(pl.LightningModule):
         size = self.hparams.input_size
 
         for i in range(self.hparams.batch_size):
-            out = new_image('RGB', (4 * size, 2 * size))
-            out.paste(ref[i], (0, 0))
-            out.paste(x[0][i], (size, 0))
-            out.paste(y[i], (3 * size, 0))
+            out = Image.new('RGB', (4 * size, 2 * size))
+            out.paste(toImage(ref[i]), (0, 0))
+            out.paste(toImage(x[0][i]), (size, 0))
+            out.paste(toImage(y[i]), (3 * size, 0))
             out.save(Path(self.hparams.test_output_dir, 'output{}_{}.jpg'.format(xid, i)))
 
 
