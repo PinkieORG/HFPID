@@ -90,6 +90,7 @@ class HFPID(pl.LightningModule):
         loss = loss / len(outputs)
         self.log('loss', loss)
 
+
 if __name__ == '__main__':
     args = get_args()
     logger = TensorBoardLogger('./logs', name='')
