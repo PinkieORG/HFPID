@@ -116,7 +116,7 @@ class HFPID(pl.LightningModule):
         y = self.decoder(x[0])
         y = inv_transform(y)
         ref = inv_transform(x[1])
-        images = torch.zeros((2 * x.size[0], *x.size[1:]))
+        images = torch.zeros((2 * y.size[0], *y.size[1:]))
         images[::2, :, :, :] = ref
         images[1::2, :, :, :] = y
         save_image(images, fp=Path(self.hparams.test_output_dir, 'test_output.jpg'), nrow=6)
