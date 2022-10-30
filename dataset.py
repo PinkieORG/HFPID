@@ -5,7 +5,7 @@ import torchvision.transforms as transforms
 
 
 class Imagenette2(Dataset):
-    def __init__(self, mode, root='./imagenette2', input_size=255):
+    def __init__(self, mode, root='./imagenette2', input_size=256):
         self.mode = mode
         self.root = root
         self.transform = transforms.Compose([transforms.Resize((input_size, input_size)),

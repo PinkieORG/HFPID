@@ -10,7 +10,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('file', help="Image to downscale.")
     parser.add_argument('--weights', help="Path to weights of HFPIM model.")
-    parser.add_argument('--input_size', default=256,
+    parser.add_argument('--input_size', default=512,
                         help="Size of the input images. One number for square size.", type=int)
     parser.add_argument('--in_channels', default=3, help="Number of channels of a input images.", type=int)
     return parser.parse_args()
