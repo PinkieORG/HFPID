@@ -78,7 +78,7 @@ class HFPID(pl.LightningModule):
         for out in outputs:
             loss += out
         loss = loss / len(outputs)
-        self.log('loss', loss)
+        self.log('loss', loss, sync_dist=True)
 
     def validation_step(self, x, xid):
         y_ref = self.ref_upscaler(x)
@@ -108,5 +108,5 @@ if __name__ == '__main__':
                          log_every_n_steps=args.log_every_n_steps,
                          check_val_every_n_epoch=args.check_val_every_n_epoch,
                          accelerator='gpu',
-                         devices=1)
+                         devices=2)
     trainer.fit(pl_model)
