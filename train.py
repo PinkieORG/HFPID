@@ -112,7 +112,6 @@ class HFPID(pl.LightningModule):
         self.log('loss', loss)
 
     def test_step(self, x, xid):
-        pdb.set_trace()
         inv_transform = transforms.Compose([transforms.Normalize([0, 0, 0], [1 / 0.229, 1 / 0.224, 1 / 0.225]),
                                             transforms.Normalize([-0.485, -0.456, -0.406], [1, 1, 1])])
         y = self.decoder(x[0])
