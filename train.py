@@ -72,12 +72,8 @@ class HFPID(pl.LightningModule):
         loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
-    def validation_epoch_end(self, outputs):
-        loss = 0
-        for out in outputs:
-            loss += out
-        loss = loss / len(outputs)
-        self.log('loss', loss, sync_dist=True)
+    def training_epoch_end(self, outputs):
+        self.SSIM.reset()
 
     def validation_step(self, x, xid):
         y_ref = self.ref_upscaler(x)
@@ -87,6 +83,12 @@ class HFPID(pl.LightningModule):
         loss += self.hparams.lamb * self.L1Loss(x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
+    def validation_epoch_end(self, outputs):
+        loss = 0
+        for out in outputs:
+            loss += out
+        loss = loss / len(outputs)
+        self.log('loss', loss)
 
 if __name__ == '__main__':
     args = get_args()
