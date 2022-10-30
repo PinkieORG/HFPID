@@ -129,10 +129,11 @@ class HFPID(pl.LightningModule):
 
         size = self.hparams.input_size
 
-        for i in range(self.hparams.batch_size):
+        for i in range(b):
+            original = inv_transform(x[0][i])
             out = Image.new('RGB', (4 * size, 2 * size))
             out.paste(toImage(ref[i]), (0, 0))
-            out.paste(toImage(x[0][i]), (size, 0))
+            out.paste(toImage(original), (size, 0))
             out.paste(toImage(y[i]), (3 * size, 0))
             out.save(Path(self.hparams.test_output_dir, 'output{}_{}.jpg'.format(xid, i)))
 
