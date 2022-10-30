@@ -77,7 +77,7 @@ class HFPID(pl.LightningModule):
         if self.hparams.test_image:
             dataset = OneImage(self.hparams.test_image, input_size=2 * self.hparams.input_size)
             return torch.utils.data.DataLoader(dataset, batch_size=1)
-        dataset = Imagenette2('test', input_size=self.hparams.input_size)
+        dataset = Imagenette2('test', input_size=2 * self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def configure_optimizers(self):
