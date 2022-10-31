@@ -61,11 +61,11 @@ def get_args():
                                                                          "downsampling, original image and output of"
                                                                          "the decoder. These images are stitched"
                                                                          "from left to right as mentioned.")
-    parser.add_argument('--do_not_save_results', action='store_false', help="Output of the decoder will not be saved.")
-    parser.add_argument('--do_not_save_originals', action='store_false', help="Original (larger) image will not be "
-                                                                              "saved.")
-    parser.add_argument('--do_not_save_reference', action='store_false', help="Output of the simple downsampling will "
-                                                                              "not be saved.")
+    parser.add_argument('--do_not_save_results', action='store_true', help="Output of the decoder will not be saved.")
+    parser.add_argument('--do_not_save_originals', action='store_true', help="Original (larger) image will not be "
+                                                                             "saved.")
+    parser.add_argument('--do_not_save_reference', action='store_true', help="Output of the simple downsampling will "
+                                                                             "not be saved.")
     return parser.parse_args()
 
 
