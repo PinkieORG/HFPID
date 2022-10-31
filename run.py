@@ -11,11 +11,14 @@ from torchmetrics import StructuralSimilarityIndexMeasure as SSIM
 from torchvision.transforms import transforms
 from torchvision.utils import save_image
 import models
-from dataset import Imagewoof, OneImage
+from dataset import HFPIDDataset, OneImage
 
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--path_to_data', help="Path to data directory. There needs to be two "
+                                               "subdirectories: "
+                                               "'train' and 'val'.")
     parser.add_argument('--ref_upscaler', default='bilinear',
                         help="Method to get a referential upscaled image for encoder output."
                              "Possible methods: bilinear")
@@ -81,18 +84,18 @@ class HFPID(pl.LightningModule):
             raise ValueError("Method for referential upscaled image is missing or not among possible choices.")
 
     def train_dataloader(self):
-        dataset = Imagewoof('train', input_size=self.hparams.input_size)
+        dataset = HFPIDDataset('train', root=self.hparams.path_to_data, input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
     def val_dataloader(self):
-        dataset = Imagewoof('val', input_size=self.hparams.input_size)
+        dataset = HFPIDDataset('val', root=self.hparams.path_to_data, input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def test_dataloader(self):
         if self.hparams.test_image:
             dataset = OneImage(self.hparams.test_image, input_size=2 * self.hparams.input_size)
             return torch.utils.data.DataLoader(dataset, batch_size=1)
-        dataset = Imagewoof('test', input_size=2 * self.hparams.input_size)
+        dataset = HFPIDDataset('test', root=self.hparams.path_to_data, input_size=2 * self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def configure_optimizers(self):

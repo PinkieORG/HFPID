@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
 
-class Imagewoof(Dataset):
+class HFPIDDataset(Dataset):
     def __init__(self, mode, root='./imagewoof', input_size=256):
         self.mode = mode
         self.root = root
