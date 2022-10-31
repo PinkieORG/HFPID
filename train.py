@@ -132,8 +132,7 @@ class HFPID(pl.LightningModule):
         for i in range(b):
             original = inv_transform(x[0][i])
             res = y[i]
-            min, max = res.min(), res.max()
-            res = (res - min) / (max - min)
+            res = res.clamp(0, 1)
             out = Image.new('RGB', (4 * size, 2 * size))
             out.paste(toImage(ref[i]), (0, 0))
             out.paste(toImage(original), (size, 0))
