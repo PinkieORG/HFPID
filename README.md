@@ -1,7 +1,8 @@
 # High-Frequency Preserving Image Downscaler
 
-This is an unofficial implementation.
-link to paper: https://ieeexplore.ieee.org/document/9506575
+This is an unofficial implementation. 
+
+Link to paper: https://ieeexplore.ieee.org/document/9506575
 
 ## Instalation
 
