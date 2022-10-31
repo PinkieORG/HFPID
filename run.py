@@ -186,6 +186,7 @@ if __name__ == '__main__':
                          devices=1)
     if args.weights:
         pl_model = HFPID.load_from_checkpoint(args.weights,
+                                              path_to_data=args.path_to_data,
                                               test_image=args.test_image,
                                               test_output_dir=args.test_output_dir,
                                               save_grids=args.save_grids,
