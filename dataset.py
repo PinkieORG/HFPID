@@ -27,7 +27,7 @@ class HFPIDDataset(Dataset):
         if self.mode == 'test':
             ref_image = nn.functional.interpolate(image.unsqueeze(0), scale_factor=0.5).squeeze()
             return image, ref_image
-        return self.transform(image)
+        return image
 
 
 class OneImage(Dataset):
