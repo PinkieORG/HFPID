@@ -1,7 +1,5 @@
 import argparse
-import pdb
 from pathlib import Path
-
 from PIL import Image
 import torch.utils.data
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -12,9 +10,8 @@ import pytorch_lightning as pl
 from torchmetrics import StructuralSimilarityIndexMeasure as SSIM
 from torchvision.transforms import transforms
 from torchvision.utils import save_image
-
 import models
-from dataset import Imagenette2, OneImage
+from dataset import Imagewoof, OneImage
 
 
 def get_args():
@@ -84,18 +81,18 @@ class HFPID(pl.LightningModule):
             raise ValueError("Method for referential upscaled image is missing or not among possible choices.")
 
     def train_dataloader(self):
-        dataset = Imagenette2('train', input_size=self.hparams.input_size)
+        dataset = Imagewoof('train', input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=True, num_workers=10)
 
     def val_dataloader(self):
-        dataset = Imagenette2('val', input_size=self.hparams.input_size)
+        dataset = Imagewoof('val', input_size=self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def test_dataloader(self):
         if self.hparams.test_image:
             dataset = OneImage(self.hparams.test_image, input_size=2 * self.hparams.input_size)
             return torch.utils.data.DataLoader(dataset, batch_size=1)
-        dataset = Imagenette2('test', input_size=2 * self.hparams.input_size)
+        dataset = Imagewoof('test', input_size=2 * self.hparams.input_size)
         return torch.utils.data.DataLoader(dataset, batch_size=self.hparams.batch_size, shuffle=False, num_workers=10)
 
     def configure_optimizers(self):
@@ -153,9 +150,9 @@ class HFPID(pl.LightningModule):
             if not self.hparams.do_not_save_results:
                 res.save(Path(self.hparams.test_output_dir, 'result{}_{}.jpg'.format(xid, i)))
             if not self.hparams.do_not_save_originals:
-                orig.save(Path(self.hparams.test_output_dir,'original{}_{}.jpg'.format(xid, i)))
+                orig.save(Path(self.hparams.test_output_dir, 'original{}_{}.jpg'.format(xid, i)))
             if not self.hparams.do_not_save_reference:
-                ref.save(Path(self.hparams.test_output_dir,'reference{}_{}.jpg'.format(xid, i)))
+                ref.save(Path(self.hparams.test_output_dir, 'reference{}_{}.jpg'.format(xid, i)))
             if self.hparams.save_image_groups:
                 out = Image.new('RGB', (4 * size, 2 * size))
                 out.paste(ref, (0, 0))

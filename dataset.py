@@ -5,8 +5,8 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
 
-class Imagenette2(Dataset):
-    def __init__(self, mode, root='./imagenette2', input_size=256):
+class Imagewoof(Dataset):
+    def __init__(self, mode, root='./imagewoof', input_size=256):
         self.mode = mode
         self.root = root
         self.transform = transforms.Compose([transforms.Resize((input_size, input_size)),
@@ -20,8 +20,8 @@ class Imagenette2(Dataset):
     def __len__(self):
         return len(self.images)
 
-    def __getitem__(self, id):
-        image_path = self.images[id]
+    def __getitem__(self, item):
+        image_path = self.images[item]
         image = Image.open(image_path).convert('RGB')
         image = self.transform(image)
         if self.mode == 'test':
@@ -41,7 +41,7 @@ class OneImage(Dataset):
     def __len__(self):
         return 1
 
-    def __getitem__(self, id):
+    def __getitem__(self, item):
         image = Image.open(self.image_path).convert('RGB')
         image = self.transform(image)
         ref_image = nn.functional.interpolate(image.unsqueeze(0), scale_factor=0.5).squeeze()
