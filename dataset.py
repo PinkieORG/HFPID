@@ -44,5 +44,5 @@ class OneImage(Dataset):
     def __getitem__(self, id):
         image = Image.open(self.image_path).convert('RGB')
         image = self.transform(image)
-        ref_image = nn.functional.interpolate(image, scale_factor=0.5)
+        ref_image = nn.functional.interpolate(image.unsqueeze(0), scale_factor=0.5).squeeze()
         return image, ref_image
