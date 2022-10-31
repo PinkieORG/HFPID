@@ -46,11 +46,26 @@ def get_args():
     parser.add_argument('--weights', default='',
                         help="If path to file with weights is passed then program will enter test mode."
                              "Input image(s) will be pre-resized to 2 times of the input_size"
-                             "of the loaded model and fed to the encoder part of the model."
+                             "of the loaded model and fed to the decoder part of the model."
                              "Will use validation dataset on default. If you want to use"
                              "other image then specify test_file argument (only one at the time).")
     parser.add_argument('--test_image', default='', help="Image to downscale when in test mode.")
     parser.add_argument('--test_output_dir', default='test', help="Directory where outputs of testing will be saved.")
+    parser.add_argument('--save_grids', action='store_true', help="For each batch creates grid of images where"
+                                                                  "the output of decoder and output of the simple"
+                                                                  "downsampling are next fo each other."
+                                                                  "This can be useful for comparing efficiency of"
+                                                                  "this method.")
+    parser.add_argument('--save_image_groups', action='store_true', help="For each image creates creates one image"
+                                                                         "made of three images: one made by simple"
+                                                                         "downsampling, original image and output of"
+                                                                         "the decoder. These images are stitched"
+                                                                         "from left to right as mentioned.")
+    parser.add_argument('--do_not_save_results', action='store_false', help="Output of the decoder will not be saved.")
+    parser.add_argument('--do_not_save_originals', action='store_false', help="Original (larger) image will not be "
+                                                                              "saved.")
+    parser.add_argument('--do_not_save_reference', action='store_false', help="Output of the simple downsampling will "
+                                                                              "not be saved.")
     return parser.parse_args()
 
 
@@ -116,28 +131,37 @@ class HFPID(pl.LightningModule):
     def test_step(self, x, xid):
         inv_transform = transforms.Compose([transforms.Normalize([0, 0, 0], [1 / 0.229, 1 / 0.224, 1 / 0.225]),
                                             transforms.Normalize([-0.485, -0.456, -0.406], [1, 1, 1])])
-        toImage = transforms.ToPILImage()
+        to_image = transforms.ToPILImage()
 
-        y = self.decoder(x[0])
-        y = inv_transform(y)
-        ref = inv_transform(x[1])
-        b, c, h, w = y.size()
-        images = torch.zeros((2*b, c, h, w))
-        images[::2, :, :, :] = ref
-        images[1::2, :, :, :] = y
-        save_image(images, fp=Path(self.hparams.test_output_dir, 'grid{}.jpg'.format(xid)), nrow=6)
+        original = x[0]
+        result = self.decoder(original)
+        result = inv_transform(result)
+        reference = inv_transform(x[1])
+        b, c, h, w = result.size()
+
+        if self.hparams.save_grids:
+            images = torch.zeros((2 * b, c, h, w))
+            images[::2, :, :, :] = reference
+            images[1::2, :, :, :] = result
+            save_image(images, fp=Path(self.hparams.test_output_dir, 'grid{}.jpg'.format(xid)), nrow=6)
 
         size = self.hparams.input_size
-
         for i in range(b):
-            original = inv_transform(x[0][i])
-            res = y[i]
-            res = res.clamp(0, 1)
-            out = Image.new('RGB', (4 * size, 2 * size))
-            out.paste(toImage(ref[i]), (0, 0))
-            out.paste(toImage(original), (size, 0))
-            out.paste(toImage(res), (3 * size, 0))
-            out.save(Path(self.hparams.test_output_dir, 'output{}_{}.jpg'.format(xid, i)))
+            ref = to_image(reference[i])
+            orig = to_image(inv_transform(original[i]))
+            res = to_image(result[i].clamp(0, 1))
+            if not self.hparams.do_not_save_results:
+                res.save('result{}_{}.jpg'.format(xid, i))
+            if not self.hparams.do_not_save_originals:
+                orig.save('original{}_{}.jpg'.format(xid, i))
+            if not self.hparams.do_not_save_reference:
+                ref.save('reference{}_{}.jpg'.format(xid, i))
+            if self.hparams.save_image_groups:
+                out = Image.new('RGB', (4 * size, 2 * size))
+                out.paste(ref, (0, 0))
+                out.paste(orig, (size, 0))
+                out.paste(res, (3 * size, 0))
+                out.save(Path(self.hparams.test_output_dir, 'output{}_{}.jpg'.format(xid, i)))
 
 
 if __name__ == '__main__':
@@ -163,7 +187,12 @@ if __name__ == '__main__':
     if args.weights:
         pl_model = HFPID.load_from_checkpoint(args.weights,
                                               test_image=args.test_image,
-                                              test_output_dir=args.test_output_dir)
+                                              test_output_dir=args.test_output_dir,
+                                              save_grids=args.save_grids,
+                                              save_image_groups=args.save_image_groups,
+                                              do_not_save_results=args.do_not_save_results,
+                                              do_not_save_originals=args.do_not_save_originals,
+                                              do_not_save_reference=args.do_not_save_reference)
         trainer.test(pl_model)
     else:
         trainer.fit(pl_model)
