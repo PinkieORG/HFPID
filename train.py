@@ -151,11 +151,11 @@ class HFPID(pl.LightningModule):
             orig = to_image(inv_transform(original[i]))
             res = to_image(result[i].clamp(0, 1))
             if not self.hparams.do_not_save_results:
-                res.save('result{}_{}.jpg'.format(xid, i))
+                res.save(Path(self.hparams.test_output_dir, 'result{}_{}.jpg'.format(xid, i)))
             if not self.hparams.do_not_save_originals:
-                orig.save('original{}_{}.jpg'.format(xid, i))
+                orig.save(Path(self.hparams.test_output_dir,'original{}_{}.jpg'.format(xid, i)))
             if not self.hparams.do_not_save_reference:
-                ref.save('reference{}_{}.jpg'.format(xid, i))
+                ref.save(Path(self.hparams.test_output_dir,'reference{}_{}.jpg'.format(xid, i)))
             if self.hparams.save_image_groups:
                 out = Image.new('RGB', (4 * size, 2 * size))
                 out.paste(ref, (0, 0))
