@@ -91,9 +91,10 @@ def get_args():
         "model. Will use validation dataset on default. If you want to use"
         "other image then specify test_file argument (only one at the time).",
     )
-    parser.add_argument("--test_image",
-                        default="",
-                        help="Image to downscale when in test mode.")
+    parser.add_argument(
+        "--test_image",
+        default="",
+        help="Image to downscale when in test mode.")
     parser.add_argument(
         "--test_output_dir",
         default="test",
@@ -204,11 +205,13 @@ class HFPID(pl.LightningModule):
     def training_step(self, x):
         y_ref = self.ref_upscaler(x)
         y_up = self.encoder(x)
-        loss = self.hparams.lamb * (self.L1Loss(
-            y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref))
+        loss = self.hparams.lamb * (
+                    self.L1Loss(y_up, y_ref)
+                    + self.hparams.alpha * self.SSIM(y_up, y_ref)
+                )
         y_down = self.decoder(y_up)
-        loss += self.L1Loss(
-            x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
+        loss += self.L1Loss(x, y_down) \
+            + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
     def training_epoch_end(self, outputs):
@@ -217,11 +220,13 @@ class HFPID(pl.LightningModule):
     def validation_step(self, x, xid):
         y_ref = self.ref_upscaler(x)
         y_up = self.encoder(x)
-        loss = self.hparams.lamb * (self.L1Loss(
-            y_up, y_ref) + self.hparams.alpha * self.SSIM(y_up, y_ref))
+        loss = self.hparams.lamb * (
+                    self.L1Loss(y_up, y_ref)
+                    + self.hparams.alpha * self.SSIM(y_up, y_ref)
+                )
         y_down = self.decoder(y_up)
-        loss += self.L1Loss(
-            x, y_down) + self.hparams.alpha * self.SSIM(x, y_down)
+        loss += self.L1Loss(x, y_down) \
+            + self.hparams.alpha * self.SSIM(x, y_down)
         return loss
 
     def validation_epoch_end(self, outputs):
@@ -270,10 +275,8 @@ class HFPID(pl.LightningModule):
                          "original{}_{}.jpg".format(xid, i)))
             if not self.hparams.do_not_save_reference:
                 ref.save(
-                    Path(
-                        self.hparams.test_output_dir,
-                        "reference{}_{}.jpg".format(xid, i),
-                    ))
+                    Path(self.hparams.test_output_dir,
+                         "reference{}_{}.jpg".format(xid, i)))
             if self.hparams.save_image_groups:
                 out = Image.new("RGB", (4 * size, 2 * size))
                 out.paste(ref, (0, 0))
