@@ -33,13 +33,13 @@ def get_args():
     parser.add_argument(
         "--alpha",
         default=0.15,
-        help="Weigh for controlling a strength of SSIM loss.",
+        help="Weight for controlling a strength of SSIM loss.",
         type=int,
     )
     parser.add_argument(
         "--lamb",
         default=0.2,
-        help="Weigh for controlling a strength of encoder loss.",
+        help="Weight for controlling a strength of encoder loss.",
         type=int,
     )
     parser.add_argument(
@@ -57,7 +57,7 @@ def get_args():
     parser.add_argument(
         "-e",
         "--encoder_dims",
-        default=[32, 64, 64, 64, 32],
+        default=[64, 128, 256, 128, 64],
         help="List representing numbers of channels of encoder inner layers "
         "(first value represent how many channels the first layer outputs).",
         nargs=5,
@@ -66,7 +66,7 @@ def get_args():
     parser.add_argument(
         "-d",
         "--decoder_dims",
-        default=[32, 32],
+        default=[128, 128],
         help="List representing numbers of channels of encoder inner layers "
         "(because of the skipping connections, there are only two values).",
         nargs=2,
@@ -94,7 +94,8 @@ def get_args():
     parser.add_argument(
         "--test_image",
         default="",
-        help="Image to downscale when in test mode.")
+        help="Image to downscale when in test mode."
+    )
     parser.add_argument(
         "--test_output_dir",
         default="test",
