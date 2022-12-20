@@ -257,7 +257,7 @@ class HFPID(pl.LightningModule):
             save_image(
                 images,
                 fp=Path(self.hparams.test_output_dir,
-                        "grid{}.jpg".format(xid)),
+                        "grid{}.tiff".format(xid)),
                 nrow=6,
             )
 
@@ -269,15 +269,15 @@ class HFPID(pl.LightningModule):
             if not self.hparams.do_not_save_results:
                 res.save(
                     Path(self.hparams.test_output_dir,
-                         "result{}_{}.jpg".format(xid, i)))
+                         "result{}_{}.tiff".format(xid, i)))
             if not self.hparams.do_not_save_originals:
                 orig.save(
                     Path(self.hparams.test_output_dir,
-                         "original{}_{}.jpg".format(xid, i)))
+                         "original{}_{}.tiff".format(xid, i)))
             if not self.hparams.do_not_save_reference:
                 ref.save(
                     Path(self.hparams.test_output_dir,
-                         "reference{}_{}.jpg".format(xid, i)))
+                         "reference{}_{}.tiff".format(xid, i)))
             if self.hparams.save_image_groups:
                 out = Image.new("RGB", (4 * size, 2 * size))
                 out.paste(ref, (0, 0))
@@ -285,7 +285,7 @@ class HFPID(pl.LightningModule):
                 out.paste(res, (3 * size, 0))
                 out.save(
                     Path(self.hparams.test_output_dir,
-                         "output{}_{}.jpg".format(xid, i)))
+                         "output{}_{}.tiff".format(xid, i)))
 
 
 if __name__ == "__main__":
