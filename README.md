@@ -26,11 +26,17 @@ Where `path` is path to root of your downloaded dataset.
 Left is simple downsampling and right is the output of the method.
 
 ![](results/reference0_13.png) ![](results/result0_13.png)
+
 ![](results/reference10_13.png) ![](results/result10_13.png)
+
 ![](results/reference10_21.png) ![](results/result10_21.png)
+
 ![](results/reference21_22.png) ![](results/result21_22.png)
+
 ![](results/reference27_12.png) ![](results/result27_12.png)
+
 ![](results/reference4_15.png) ![](results/result4_15.png)
+
 ![](results/reference7_14.png) ![](results/result7_14.png)
 
 
