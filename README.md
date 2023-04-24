@@ -43,6 +43,6 @@ Left is simple downsampling and right is the output of the method.
 
 Here is grid where left image is simple downsampling and right is the output of the method.
 
-![](results/grid3.jpg)
+![](results/grid3.png)
 
-Dataset used for these examples is called Imagewoof (https://github.com/fastai/imagenette).
+Datasets used for these examples are from https://github.com/fastai/imagenette and https://www.kaggle.com/datasets/wwymak/architecture-dataset.
